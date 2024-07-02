@@ -14,11 +14,14 @@ jobs:
           git config --global --add safe.directory /cloudbees/workspace
       - uses: cloudbees-io/checkout@v1
         name: checkout
-      - name: Build Go App
-        uses: docker://golang:1.20
+      - uses: docker://golang:1.20
+        name: Build Go App
         run: |
           go build -v ./...
-      - name: Run tests
-        uses: docker://golang:1.20
+      - uses: docker://golang:1.20
+        name: Run tests
         run: |
           go test -v ./...
+      - uses: cloudbees-io/sonarqube-bundled-sast-scan-code@v1
+        name: Scan with sonarqube action (bundled in cloudbees)
+        kind: scan
