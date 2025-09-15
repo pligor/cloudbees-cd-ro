@@ -9,7 +9,42 @@
 <script>
   window.markerConfig = {
     project: '68ba1067f8e2fb3987f01468', 
-    source: 'snippet'
+    source: 'snippet',
+
+    // Identify your reporter
+    reporter: {
+      email: 'awesome@team.member',
+      fullName: 'Post Awesome Team Member',
+    },
+
+    // Collect custom information
+    customData: {
+      userType: 'Private',
+      userKind: 'Identified',
+      mainAddressCountry: 'AT',
+      mainAddressInAustria: true,
+      sessionState: 'Active',
+      tokenExpiresInSec: 8421,
+      tokenExpIso: '2025-09-15T12:59:00.000Z',
+      platform: 'Mobile Web',
+      deviceOS: 'Android',
+      deviceOSVersion: '14',
+      deviceBrandModel: 'Samsung SM-S921B',
+      orientation: 'Portrait',
+      theme: 'Dark',
+      viewportPx: '390x844',
+      screenPx: '1080x2340',
+      devicePixelRatio: 3,
+      connectionState: 'Online',
+      connectionType: '4g',
+      downlinkMbps: 30,
+      rttMs: 70,
+      runtimeEnvironment: 'staging',
+      pagePath: '/sendungen/track',
+      pageQuery: '?code=AB123456789AT',
+      buildVersion: '2025.09.15.1234'
+    },
+
   };
 
   !function(e,r,a){if(!e.__Marker){e.__Marker={};var t=[],n={__cs:t};["show","hide","isVisible","capture","cancelCapture","unload","reload","isExtensionInstalled","setReporter","clearReporter","setCustomData","on","off"].forEach(function(e){n[e]=function(){var r=Array.prototype.slice.call(arguments);r.unshift(e),t.push(r)}}),e.Marker=n;var s=r.createElement("script");s.async=1,s.src="https://edge.marker.io/latest/shim.js";var i=r.getElementsByTagName("script")[0];i.parentNode.insertBefore(s,i)}}(window,document);
