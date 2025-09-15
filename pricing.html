@@ -8,17 +8,24 @@
   
 <script>
   window.markerConfig = {
-    project: '68ba1067f8e2fb3987f01468', 
+    project: '68ba1067f8e2fb3987f01468',
     source: 'snippet',
-    reporter: {
-      email: 'handsome@at.least',
-      fullName: 'Nice Try',
-    },
+    reporter: { email: 'handsome@at.least', fullName: 'Nice Try' }
   };
 </script>
+
+<!-- 1) Bootstrap Marker first -->
 <script>
-  !function(e,r,a){if(!e.__Marker){e.__Marker={};var t=[],n={__cs:t};["show","hide","isVisible","capture","cancelCapture","unload","reload","isExtensionInstalled","setReporter","clearReporter","setCustomData","on","off"].forEach(function(e){n[e]=function(){var r=Array.prototype.slice.call(arguments);r.unshift(e),t.push(r)}}),e.Marker=n;var s=r.createElement("script");s.async=1,s.src="https://edge.marker.io/latest/shim.js";var i=r.getElementsByTagName("script")[0];i.parentNode.insertBefore(s,i)}}(window,document);
+!function(e,r,a){if(!e.__Marker){e.__Marker={};var t=[],n={__cs:t};
+["show","hide","isVisible","capture","cancelCapture","unload","reload",
+ "isExtensionInstalled","setReporter","clearReporter","setCustomData","on","off"]
+.forEach(function(e){n[e]=function(){var r=Array.prototype.slice.call(arguments);
+r.unshift(e),t.push(r)}}),e.Marker=n;var s=r.createElement("script");
+s.async=1,s.src="https://edge.marker.io/latest/shim.js";
+var i=r.getElementsByTagName("script")[0];i.parentNode.insertBefore(s,i)}}(window,document);
 </script>
+
+<!-- 2) Then your generator -->
 <script src="assets/markerio-customdata.js"></script>
 
 </head>
@@ -36,7 +43,7 @@
   </header>
 
   <main class="container">
-    <h1>Price calculator</h1>
+    <h1>Price Calculator</h1>
 
     <form id="priceForm" class="grid card" novalidate>
       <div>
