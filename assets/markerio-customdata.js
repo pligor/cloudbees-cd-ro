@@ -217,23 +217,44 @@
     };
   }
 
-  function applyCustomData(customData) {
-    // Pre-init: set on global config
-    window.markerConfig = window.markerConfig || {};
-    window.markerConfig.customData = customData;
+// --- replace your applyCustomData with this ---
+function applyCustomData(customData) {
+  window.markerConfig = window.markerConfig || {};
+  window.markerConfig.customData = customData; // baseline, for early load
 
-    // If Marker SDK exposes a runtime update method, try to call it safely
-    try {
-      if (window.Marker && typeof window.Marker === 'function') {
-        // Some SDKs support commands like 'setCustomData' or 'update'
-        // We attempt common variants without breaking if absent.
+  try {
+    if (window.Marker) {
+      // Prefer object-method API
+      if (typeof window.Marker.setCustomData === 'function') {
+        window.Marker.setCustomData(customData);
+      } else if (typeof window.Marker === 'function') {
+        // Fallback for function-style SDKs
         window.Marker('setCustomData', customData);
       }
-    } catch (_) {}
+      // Also (re)apply when the widget is fully loaded
+      if (typeof window.Marker.on === 'function') {
+        window.Marker.on('load', function () {
+          if (typeof window.Marker.setCustomData === 'function') {
+            window.Marker.setCustomData(customData);
+          } else if (typeof window.Marker === 'function') {
+            window.Marker('setCustomData', customData);
+          }
+        });
+        // Optional: ensure freshest data right before submit
+        window.Marker.on('feedbackbeforesend', function () {
+          const latest = buildCustomData(); // your existing function
+          if (typeof window.Marker.setCustomData === 'function') {
+            window.Marker.setCustomData(latest);
+          } else if (typeof window.Marker === 'function') {
+            window.Marker('setCustomData', latest);
+          }
+        });
+      }
+    }
+  } catch (_) {}
 
-    // Expose for quick QA inspection (optional)
-    window.__markerCustomData = customData;
-  }
+  window.__markerCustomData = customData; // for console inspection
+}
 
   function refresh() {
     applyCustomData(buildCustomData());
