@@ -84,14 +84,21 @@
     return (window.innerHeight >= window.innerWidth) ? 'Portrait' : 'Landscape';
   }
 
-  function theme() {
-    const explicit =
-      document.documentElement.getAttribute('data-theme') ||
-      document.body.getAttribute('data-theme');
-    if (explicit) return explicit.toLowerCase() === 'dark' ? 'Dark' : 'Light';
-    const mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
-    return mq && mq.matches ? 'Dark' : 'Light';
-  }
+function theme() {
+  const htmlTheme = document.documentElement && document.documentElement.getAttribute
+    ? document.documentElement.getAttribute('data-theme')
+    : null;
+
+  const bodyTheme = document.body && document.body.getAttribute
+    ? document.body.getAttribute('data-theme')
+    : null;
+
+  const explicit = htmlTheme || bodyTheme;
+  if (explicit) return explicit.toLowerCase() === 'dark' ? 'Dark' : 'Light';
+
+  const mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  return mq && mq.matches ? 'Dark' : 'Light';
+}
 
   function connectionInfo() {
     const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -256,9 +263,29 @@
     window.__markerCustomData = customData; // for console inspection
   }
 
-  function refresh() {
-    applyCustomData(buildCustomData());
+function refresh() {
+  let data;
+  try {
+    data = buildCustomData();
+  } catch (err) {
+    // Never fail silently in a demo: set minimal data and keep going
+    console.warn('[markerio-customdata] build failed, falling back:', err);
+    data = {
+      runtimeEnvironment: (function(){ 
+        const host = location.hostname.toLowerCase();
+        if (host.includes('localhost') || host.startsWith('127.')) return 'testing';
+        if (host.includes('dev') || host.includes('qa') || host.includes('test')) return 'testing';
+        if (host.includes('stage') || host.includes('staging') || host.includes('preprod') || host.includes('uat')) return 'staging';
+        return 'production';
+      })(),
+      pagePath: location.pathname,
+      pageQuery: location.search || '',
+      buildVersion: (window.APP_CONTEXT && window.APP_CONTEXT.buildVersion) || 'Unknown',
+      error: 'buildCustomData_failed'
+    };
   }
+  applyCustomData(data);
+}
 
   // Initial apply
   refresh();
