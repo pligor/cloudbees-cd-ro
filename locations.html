@@ -1,1 +1,41 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Locations</title><link rel="stylesheet" href="assets/styles.css"></head><body><h1>Locations Page</h1><script src="assets/app.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Locations – Austrian Post Demo</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="logo"></span><strong>Austrian Post</strong><span class="badge">demo</span></a>
+    <nav class="nav">
+      <a href="track.html">Track</a>
+      <a href="locations.html">Locations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="help.html">Help</a>
+    </nav>
+    <div class="spacer"></div>
+    <button id="feedbackBtn" class="btn ghost">Feedback</button>
+  </header>
+
+  <main class="container">
+    <h1>Find a location</h1>
+    <div class="filter-bar">
+      <input id="cityFilter" type="text" placeholder="City or postal code (e.g. Wien, 1010)" />
+      <select id="serviceFilter">
+        <option value="">All services</option>
+        <option value="post">Post office</option>
+        <option value="pickup">Pickup station</option>
+        <option value="parcel">Parcel point</option>
+      </select>
+      <button id="applyFilters" class="btn">Search</button>
+    </div>
+
+    <div id="locationsList" class="cards"></div>
+  </main>
+
+  <footer class="footer"><div class="container row"><small>© <span id="year"></span> Austrian Post Demo</small></div></footer>
+  <script src="assets/app.js"></script>
+</body>
+</html>

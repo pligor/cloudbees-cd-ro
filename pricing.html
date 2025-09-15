@@ -1,1 +1,78 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Pricing</title><link rel="stylesheet" href="assets/styles.css"></head><body><h1>Pricing Page</h1><script src="assets/app.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pricing – Austrian Post Demo</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="logo"></span><strong>Austrian Post</strong><span class="badge">demo</span></a>
+    <nav class="nav">
+      <a href="track.html">Track</a>
+      <a href="locations.html">Locations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="help.html">Help</a>
+    </nav>
+    <div class="spacer"></div>
+    <button id="feedbackBtn" class="btn ghost">Feedback</button>
+  </header>
+
+  <main class="container">
+    <h1>Price calculator</h1>
+
+    <form id="priceForm" class="grid card" novalidate>
+      <div>
+        <label for="zone">Destination</label>
+        <select id="zone" required>
+          <option value="domestic">Domestic (AT)</option>
+          <option value="eu">EU</option>
+          <option value="intl">International</option>
+        </select>
+      </div>
+      <div>
+        <label for="service">Service</label>
+        <select id="service">
+          <option value="standard">Standard</option>
+          <option value="express">Express</option>
+        </select>
+      </div>
+      <div>
+        <label for="weight">Weight (kg)</label>
+        <input id="weight" type="number" min="0" step="0.1" value="1.0" required />
+      </div>
+      <div>
+        <label for="size">Size</label>
+        <select id="size">
+          <option value="s">S (max 35 cm)</option>
+          <option value="m">M (max 60 cm)</option>
+          <option value="l">L (max 100 cm)</option>
+        </select>
+      </div>
+      <div class="row">
+        <label><input id="signature" type="checkbox" /> Signature on delivery</label>
+        <label><input id="insurance" type="checkbox" /> Insurance</label>
+      </div>
+      <div class="row">
+        <button class="btn" type="reset">Reset</button>
+        <button class="btn primary" type="submit">Calculate</button>
+      </div>
+    </form>
+
+    <div id="priceResult" class="card hidden">
+      <h2 class="tight">Estimated price</h2>
+      <div class="price">
+        <span class="currency">€</span>
+        <span id="priceTotal" class="amount">0.00</span>
+      </div>
+      <table class="table">
+        <tbody id="priceBreakdown"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container row"><small>© <span id="year"></span> Austrian Post Demo</small></div></footer>
+  <script src="assets/app.js"></script>
+</body>
+</html>

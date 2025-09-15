@@ -1,1 +1,50 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Track</title><link rel="stylesheet" href="assets/styles.css"></head><body><h1>Track Page</h1><script src="assets/app.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Track a shipment – Austrian Post Demo</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="logo"></span><strong>Austrian Post</strong><span class="badge">demo</span></a>
+    <nav class="nav">
+      <a href="track.html">Track</a>
+      <a href="locations.html">Locations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="help.html">Help</a>
+    </nav>
+    <div class="spacer"></div>
+    <button id="feedbackBtn" class="btn ghost">Feedback</button>
+  </header>
+
+  <main class="container">
+    <h1>Track a shipment</h1>
+    <form id="trackForm" class="track-form" novalidate>
+      <label class="visually-hidden" for="trackId">Tracking number</label>
+      <input id="trackId" name="trackId" type="text" placeholder="AT1234567890" pattern="[A-Za-z]{2}[0-9]{10}" required />
+      <button class="btn primary" type="submit">Check status</button>
+      <button class="btn" id="randomId" type="button">Use sample</button>
+    </form>
+
+    <div id="trackResult" class="result card hidden" data-marker-id="track-result">
+      <div class="row">
+        <h2 class="tight">Status</h2>
+        <span id="statusPill" class="pill">Pending</span>
+        <div class="spacer"></div>
+        <button class="btn ghost" id="copyLink">Copy share link</button>
+      </div>
+      <p id="statusText" class="muted">Loading…</p>
+
+      <ol id="timeline" class="timeline"></ol>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container row"><small>© <span id="year"></span> Austrian Post Demo</small></div>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
