@@ -80,7 +80,7 @@
       if (screen.orientation && screen.orientation.type) {
         return screen.orientation.type.includes('portrait') ? 'Portrait' : 'Landscape';
       }
-    } catch (_) {}
+    } catch (_) { }
     return (window.innerHeight >= window.innerWidth) ? 'Portrait' : 'Landscape';
   }
 
@@ -114,7 +114,7 @@
       try {
         const v = localStorage.getItem(k);
         if (v && v.split('.').length === 3) return v;
-      } catch (_) {}
+      } catch (_) { }
       // try cookies
       try {
         const cookie = document.cookie.split('; ').find(x => x.startsWith(k + '='));
@@ -122,7 +122,7 @@
           const v = decodeURIComponent(cookie.split('=')[1]);
           if (v && v.split('.').length === 3) return v;
         }
-      } catch (_) {}
+      } catch (_) { }
     }
     return null;
   }
@@ -217,44 +217,44 @@
     };
   }
 
-// --- replace your applyCustomData with this ---
-function applyCustomData(customData) {
-  window.markerConfig = window.markerConfig || {};
-  window.markerConfig.customData = customData; // baseline, for early load
+  // --- replace your applyCustomData with this ---
+  function applyCustomData(customData) {
+    window.markerConfig = window.markerConfig || {};
+    window.markerConfig.customData = customData; // baseline, for early load
 
-  try {
-    if (window.Marker) {
-      // Prefer object-method API
-      if (typeof window.Marker.setCustomData === 'function') {
-        window.Marker.setCustomData(customData);
-      } else if (typeof window.Marker === 'function') {
-        // Fallback for function-style SDKs
-        window.Marker('setCustomData', customData);
+    try {
+      if (window.Marker) {
+        // Prefer object-method API
+        if (typeof window.Marker.setCustomData === 'function') {
+          window.Marker.setCustomData(customData);
+        } else if (typeof window.Marker === 'function') {
+          // Fallback for function-style SDKs
+          window.Marker('setCustomData', customData);
+        }
+        // Also (re)apply when the widget is fully loaded
+        if (typeof window.Marker.on === 'function') {
+          window.Marker.on('load', function () {
+            if (typeof window.Marker.setCustomData === 'function') {
+              window.Marker.setCustomData(customData);
+            } else if (typeof window.Marker === 'function') {
+              window.Marker('setCustomData', customData);
+            }
+          });
+          // Optional: ensure freshest data right before submit
+          window.Marker.on('feedbackbeforesend', function () {
+            const latest = buildCustomData(); // your existing function
+            if (typeof window.Marker.setCustomData === 'function') {
+              window.Marker.setCustomData(latest);
+            } else if (typeof window.Marker === 'function') {
+              window.Marker('setCustomData', latest);
+            }
+          });
+        }
       }
-      // Also (re)apply when the widget is fully loaded
-      if (typeof window.Marker.on === 'function') {
-        window.Marker.on('load', function () {
-          if (typeof window.Marker.setCustomData === 'function') {
-            window.Marker.setCustomData(customData);
-          } else if (typeof window.Marker === 'function') {
-            window.Marker('setCustomData', customData);
-          }
-        });
-        // Optional: ensure freshest data right before submit
-        window.Marker.on('feedbackbeforesend', function () {
-          const latest = buildCustomData(); // your existing function
-          if (typeof window.Marker.setCustomData === 'function') {
-            window.Marker.setCustomData(latest);
-          } else if (typeof window.Marker === 'function') {
-            window.Marker('setCustomData', latest);
-          }
-        });
-      }
-    }
-  } catch (_) {}
+    } catch (_) { }
 
-  window.__markerCustomData = customData; // for console inspection
-}
+    window.__markerCustomData = customData; // for console inspection
+  }
 
   function refresh() {
     applyCustomData(buildCustomData());
@@ -275,4 +275,53 @@ function applyCustomData(customData) {
   } else {
     window.addEventListener('orientationchange', refresh);
   }
+
+  // --- Fail-safe: wire Marker even if this file loaded before the shim ---
+  (function waitForMarkerAndWire() {
+    let wired = false;
+    let tries = 0;
+    const maxTries = 80; // ~20s at 250ms
+
+    function nowData() { return buildCustomData(); }
+
+    function tryWire() {
+      if (wired) return true;
+      const M = window.Marker;
+      if (!M) return false;
+
+      const data = nowData();
+
+      // Set immediately (queues if the full widget isn't ready yet)
+      if (typeof M.setCustomData === 'function') {
+        M.setCustomData(data);
+      } else if (typeof M === 'function') {
+        M('setCustomData', data);
+      }
+
+      // Also refresh on load and right before submit
+      if (typeof M.on === 'function') {
+        M.on('load', function () {
+          const d = nowData();
+          if (typeof M.setCustomData === 'function') M.setCustomData(d);
+          else if (typeof M === 'function') M('setCustomData', d);
+        });
+        M.on('feedbackbeforesend', function () {
+          const d = nowData();
+          if (typeof M.setCustomData === 'function') M.setCustomData(d);
+          else if (typeof M === 'function') M('setCustomData', d);
+        });
+      }
+
+      wired = true;
+      return true;
+    }
+
+    // Try now, then poll briefly until stub shows up
+    if (!tryWire()) {
+      const timer = setInterval(function () {
+        tries++;
+        if (tryWire() || tries >= maxTries) clearInterval(timer);
+      }, 250);
+    }
+  })();
 })();
