@@ -3,659 +3,94 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Modern Dashboard Playground</title>
-  <meta name="description" content="A single-file modern dashboard playground with common UI components." />
-  <style>
-    /*
-      Modern, single-file dashboard playground
-      - No build step
-      - Responsive layout
-      - Light/Dark theme with CSS variables
-      - Components: navbar, hero, sidebar, cards, charts, table (sortable), tabs,
-        accordion, modal, toast, form with validation, drag & drop, progress bars
-    */
-
-    :root {
-      --bg: #0b0c10;
-      --bg-elev: #111318;
-      --text: #e8eaed;
-      --muted: #a7b0be;
-      --primary: #5b9bff;
-      --primary-2: #7cd1f9;
-      --accent: #b983ff;
-      --good: #17c964;
-      --warn: #f5a524;
-      --bad: #f31260;
-      --border: #23262d;
-      --card: #141821;
-      --shadow: 0 10px 25px rgba(0,0,0,.25);
-      --hero-img: url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop');
-      --radius: 16px;
-      --radius-sm: 10px;
-      --radius-lg: 24px;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-    }
-
-    /* Light theme */
-    .theme-light {
-      --bg: #f5f7fb;
-      --bg-elev: #ffffff;
-      --text: #0f172a;
-      --muted: #4b5563;
-      --primary: #2563eb;
-      --primary-2: #06b6d4;
-      --accent: #7c3aed;
-      --good: #16a34a;
-      --warn: #d97706;
-      --bad: #dc2626;
-      --border: #e5e7eb;
-      --card: #ffffff;
-      --shadow: 0 10px 25px rgba(2,6,23,.08);
-    }
-
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-    }
-
-    /* Layout */
-    .app {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      min-height: 100dvh;
-    }
-
-    @media (max-width: 1024px) {
-      .app { grid-template-columns: 1fr; }
-      aside { position: fixed; inset: 0 40% 0 0; max-width: 320px; transform: translateX(-100%); transition: transform .3s ease; z-index: 60; }
-      aside.open { transform: translateX(0); }
-      .backdrop { display: none; }
-      .backdrop.show { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 50; }
-    }
-
-    aside {
-      background: var(--bg-elev);
-      border-right: 1px solid var(--border);
-      padding: 20px;
-    }
-
-    main { display: grid; grid-template-rows: auto 1fr auto; min-height: 100dvh; }
-
-    /* Topbar */
-    .topbar {
-      display: flex; align-items: center; gap: 12px; padding: 14px 20px; background: var(--bg-elev);
-      border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 40;
-    }
-    .brand { display:flex; align-items:center; gap:10px; font-weight: 700; letter-spacing: .25px; }
-    .brand-logo { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--primary), var(--accent)); box-shadow: var(--shadow); }
-    .search {
-      margin-left: auto; display:flex; align-items:center; gap:10px; background: var(--bg);
-      border: 1px solid var(--border); border-radius: 999px; padding: 8px 12px; width: min(520px, 55vw);
-    }
-    .search input { width: 100%; background: transparent; border: 0; outline: none; color: var(--text); font-size: 14px; }
-    .icon-btn { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 8px 10px; cursor: pointer; display:inline-flex; align-items:center; gap:8px; }
-    .icon-btn:hover { background: var(--card); }
-
-    /* Sidebar */
-    nav h4 { margin: 10px 0 8px; color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .12em; }
-    nav a { display:flex; align-items:center; gap:10px; padding: 10px 12px; margin: 4px 0; text-decoration: none; color: var(--text); border-radius: 10px; }
-    nav a:hover { background: var(--card); }
-    nav a.active { background: linear-gradient(180deg, rgba(91,155,255,.15), rgba(185,131,255,.12)); border: 1px solid var(--border); }
-
-    /* Hero */
-    .hero {
-      position: relative; overflow: hidden; border-bottom: 1px solid var(--border);
-      background: radial-gradient(1200px 600px at 20% -10%, rgba(124,209,255,.15), transparent 60%),
-                  radial-gradient(800px 400px at 90% -10%, rgba(185,131,255,.18), transparent 60%),
-                  #030711;
-    }
-    .hero img { position:absolute; inset:0; width:100%; height:100%; object-fit: cover; opacity: .25; filter: saturate(.9) contrast(1.1); }
-    .hero .mask { position:absolute; inset:0; background: linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,0), var(--bg)); }
-    .hero-content { position: relative; padding: 48px 24px; display:grid; gap: 18px; max-width: 1200px; margin: 0 auto; }
-    .hero h1 { font-size: clamp(28px, 5vw, 44px); margin: 0; }
-    .hero p { color: var(--muted); margin: 0; max-width: 70ch; }
-    .cta { display:flex; gap: 10px; flex-wrap: wrap; }
-    .btn { border: 1px solid var(--border); background: var(--card); padding: 10px 14px; border-radius: 12px; color: var(--text); text-decoration: none; display:inline-flex; align-items:center; gap:10px; }
-    .btn.primary { background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: white; border: 0; box-shadow: var(--shadow); }
-
-    /* Content grid */
-    .content { padding: 24px; max-width: 1200px; margin: 0 auto; display: grid; gap: 24px; }
-    .cards { display:grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-    @media (max-width: 1100px) { .cards { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 640px) { .cards { grid-template-columns: 1fr; } }
-
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
-    .card h3 { margin: 0 0 6px; font-size: 14px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
-    .stat { display:flex; align-items:center; justify-content: space-between; }
-    .stat .value { font-size: clamp(22px, 4vw, 32px); font-weight: 800; }
-    .trend { font-size: 12px; padding: 4px 8px; border-radius: 999px; }
-    .up { background: rgba(23,201,100,.15); color: var(--good); }
-    .down { background: rgba(243,18,96,.15); color: var(--bad); }
-
-    .grid-2 { display:grid; grid-template-columns: 1.2fr .8fr; gap: 16px; }
-    @media (max-width: 1024px) { .grid-2 { grid-template-columns: 1fr; } }
-
-    .section h2 { margin: 0 0 12px; font-size: 20px; }
-    .section .desc { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
-
-    /* Table */
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
-    th { color: var(--muted); font-weight: 600; cursor: pointer; user-select: none; }
-    tr:hover td { background: rgba(255,255,255,.02); }
-
-    /* Tabs */
-    .tabs { display:flex; gap: 8px; border-bottom: 1px solid var(--border); margin-bottom: 12px; flex-wrap: wrap; }
-    .tab { padding: 8px 12px; border: 1px solid var(--border); border-bottom: none; background: var(--bg-elev); border-top-left-radius: 10px; border-top-right-radius: 10px; cursor:pointer; }
-    .tab.active { background: var(--card); }
-    .tab-panel { display:none; }
-    .tab-panel.active { display:block; }
-
-    /* Accordion */
-    .accordion {
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      background: var(--card);
-    }
-    .acc-item + .acc-item { border-top: 1px solid var(--border); }
-    .acc-btn { width: 100%; text-align: left; padding: 14px; background: transparent; border: 0; color: var(--text); font-weight: 600; cursor: pointer; }
-    .acc-content { display: none; padding: 0 14px 14px; color: var(--muted); }
-    .acc-item.open .acc-content { display: block; }
-
-    /* Form */
-    .form-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
-    @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
-    label { display:block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-    input[type="text"], input[type="email"], input[type="number"], select, textarea {
-      width: 100%; padding: 10px 12px; border:1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text);
-    }
-    .helper { font-size: 12px; color: var(--muted); }
-
-    /* Drag & Drop */
-    .dropzone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 24px; text-align:center; background: var(--bg-elev); }
-    .dropzone.dragover { background: rgba(91,155,255,.1); border-color: var(--primary); }
-
-    /* Progress */
-    .progress { height: 10px; background: #1f2430; border-radius: 999px; overflow: hidden; border: 1px solid var(--border); }
-    .progress > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .4s ease; }
-
-    /* Modal */
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; z-index: 70; }
-    .modal { width: min(560px, 92vw); background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 16px; }
-    .modal-header { display:flex; align-items:center; justify-content: space-between; }
-
-    /* Toast */
-    .toast { position: fixed; right: 16px; bottom: 16px; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); display:none; z-index: 80; }
-
-    /* Footer */
-    footer { padding: 20px; text-align:center; color: var(--muted); border-top: 1px solid var(--border); background: var(--bg-elev); }
-    a.inline { color: var(--primary); text-decoration: none; }
-
-    /* Utilities */
-    .row { display:flex; align-items:center; gap: 10px; flex-wrap: wrap; }
-    .spacer { flex: 1 1 auto; }
-    .pill { padding: 4px 8px; font-size: 12px; border-radius: 999px; background: rgba(124,209,249,.12); color: var(--primary-2); border: 1px solid var(--border); }
-    .mute { color: var(--muted); }
-    .hidden { display:none !important; }
-  </style>
+  <title>Austrian Post – Demo</title>
+  <meta name="description" content="Demo website for QA training and Marker.io integration." />
+  <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23ffd800'/%3E%3Cpath d='M26 55c8 2 16-6 24-6 7 0 13 6 24 6 6 0 10-6 10-10 0-14-19-22-34-22S16 31 16 45c0 5 4 10 10 10z' fill='%23000'/%3E%3C/svg%3E" />
 </head>
 <body>
-  <div class="app">
-    <aside id="sidebar" aria-label="Sidebar Navigation">
-      <div class="row" style="justify-content:space-between; margin-bottom: 8px;">
-        <div class="brand"><div class="brand-logo"></div> Dashboard</div>
-        <button class="icon-btn" id="closeSidebar" aria-label="Close menu" title="Close menu">✕</button>
-      </div>
-      <nav>
-        <h4>Overview</h4>
-        <a href="#" class="active"><span>🏠</span> Home</a>
-        <a href="#analytics"><span>📈</span> Analytics</a>
-        <a href="#table"><span>🧾</span> Data</a>
-        <a href="#components"><span>🧩</span> Components</a>
-        <h4>Quick Links</h4>
-        <a href="#forms"><span>📝</span> Forms</a>
-        <a href="#upload"><span>📤</span> Upload</a>
-        <a href="#about"><span>ℹ️</span> About</a>
-      </nav>
-      <div style="margin-top: 20px; font-size: 12px; color: var(--muted);">
-        <div>Theme: <span id="themeLabel">Dark</span></div>
-      </div>
-    </aside>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Austrian Post demo home">
+      <span class="logo"></span>
+      <strong>Austrian Post</strong>
+      <span class="badge">demo</span>
+    </a>
+    <nav class="nav">
+      <a href="track.html">Track</a>
+      <a href="locations.html">Locations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="help.html">Help</a>
+    </nav>
+    <div class="spacer"></div>
+    <button id="feedbackBtn" class="btn ghost" data-marker-target="feedback">Feedback</button>
+  </header>
 
-    <div class="backdrop" id="backdrop"></div>
-
-    <main>
-      <header class="topbar">
-        <button class="icon-btn" id="openSidebar" aria-label="Open menu" title="Menu">☰</button>
-        <div class="brand"><div class="brand-logo"></div> <span>Modern Dashboard</span><span class="pill">Playground</span></div>
-        <div class="search" role="search">
-          <span>🔎</span>
-          <input id="searchInput" type="search" placeholder="Search widgets, data, anything..." aria-label="Search" />
-        </div>
-        <button class="icon-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle Theme">🌓</button>
-        <button class="icon-btn" id="notifyBtn" aria-label="Notify" title="Show Toast">🔔</button>
-      </header>
-
-      <section class="hero">
-        <img alt="Hero background" src="" id="heroImg" />
-        <div class="mask" aria-hidden="true"></div>
-        <div class="hero-content">
-          <div class="row">
-            <span class="pill">New</span>
-            <span class="pill">No build step</span>
-            <span class="pill">Single file</span>
-          </div>
-          <h1>The minimalist dashboard that still does everything</h1>
-          <p>Drop this file into Netlify, Vercel, or GitHub Pages. Tweak the CSS variables, wire your APIs, and pretend you had a whole frontend team.</p>
-          <div class="cta">
-            <a href="#analytics" class="btn primary">View Analytics</a>
-            <a href="#components" class="btn">Explore Components</a>
-          </div>
-        </div>
-      </section>
-
-      <div class="content">
-        <!-- Stats cards -->
-        <div class="cards" id="overview">
-          <div class="card">
-            <h3>Revenue</h3>
-            <div class="stat">
-              <div class="value">$128.4k</div>
-              <span class="trend up">+12.3%</span>
-            </div>
-            <div class="helper">Last 30 days</div>
-          </div>
-          <div class="card">
-            <h3>Active Users</h3>
-            <div class="stat">
-              <div class="value">18,532</div>
-              <span class="trend up">+3.8%</span>
-            </div>
-            <div class="progress" aria-label="Active users progress"><div style="width:70%"></div></div>
-          </div>
-          <div class="card">
-            <h3>Churn</h3>
-            <div class="stat">
-              <div class="value">2.1%</div>
-              <span class="trend down">-0.4%</span>
-            </div>
-            <div class="helper">Down from 2.5%</div>
-          </div>
-          <div class="card">
-            <h3>Uptime</h3>
-            <div class="stat">
-              <div class="value">99.98%</div>
-              <span class="trend up">+0.01%</span>
-            </div>
-            <div class="helper">SLA: 99.9%</div>
-          </div>
-        </div>
-
-        <!-- Charts + Table -->
-        <div id="analytics" class="grid-2 section">
-          <div class="card">
-            <h2>Traffic Overview</h2>
-            <p class="desc">Visitors, signups, and conversions over time.</p>
-            <canvas id="lineChart" height="130" aria-label="Traffic line chart"></canvas>
-          </div>
-          <div class="card">
-            <h2>Category Breakdown</h2>
-            <p class="desc">Distribution by product lines.</p>
-            <canvas id="barChart" height="130" aria-label="Category bar chart"></canvas>
-          </div>
-        </div>
-
-        <div id="table" class="section card">
-          <h2>Recent Orders</h2>
-          <p class="desc">Click headers to sort. No libraries required.</p>
-          <div style="overflow:auto">
-            <table id="dataTable" aria-describedby="Recent orders sortable table">
-              <thead>
-                <tr>
-                  <th data-key="id">Order ID</th>
-                  <th data-key="customer">Customer</th>
-                  <th data-key="amount" data-type="number">Amount</th>
-                  <th data-key="status">Status</th>
-                  <th data-key="date" data-type="date">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Sample rows; replace with your data -->
-                <tr><td>#10241</td><td>Maria Papadaki</td><td>259.90</td><td>Paid</td><td>2025-07-28</td></tr>
-                <tr><td>#10242</td><td>John Carter</td><td>89.00</td><td>Refunded</td><td>2025-07-29</td></tr>
-                <tr><td>#10243</td><td>Elena Rossi</td><td>129.50</td><td>Paid</td><td>2025-08-01</td></tr>
-                <tr><td>#10244</td><td>Akira Tanaka</td><td>149.00</td><td>Pending</td><td>2025-08-02</td></tr>
-                <tr><td>#10245</td><td>George M.</td><td>399.99</td><td>Paid</td><td>2025-08-03</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Components -->
-        <div id="components" class="grid-2 section">
-          <div class="card">
-            <h2>Tabs</h2>
-            <div class="tabs" role="tablist">
-              <button class="tab active" data-tab="t1" role="tab" aria-selected="true">Overview</button>
-              <button class="tab" data-tab="t2" role="tab" aria-selected="false">Performance</button>
-              <button class="tab" data-tab="t3" role="tab" aria-selected="false">Settings</button>
-            </div>
-            <div class="tab-panel active" id="t1" role="tabpanel">
-              <p>This dashboard ships as one HTML file. Copy it, fork it, ruin it with experiments. No build tooling to babysit.</p>
-            </div>
-            <div class="tab-panel" id="t2" role="tabpanel">
-              <ul>
-                <li>Fully responsive layout</li>
-                <li>Vanilla JS interactions</li>
-                <li>Chart.js via CDN</li>
-              </ul>
-            </div>
-            <div class="tab-panel" id="t3" role="tabpanel">
-              <p>Change <code>:root</code> CSS variables for instant theming. Swap the hero by editing <code>--hero-img</code>.</p>
-            </div>
-          </div>
-
-          <div class="card">
-            <h2>Accordion</h2>
-            <div class="accordion" id="acc">
-              <div class="acc-item">
-                <button class="acc-btn">What is this?</button>
-                <div class="acc-content">A sandbox to test UI ideas without ceremony. One file to deploy.</div>
-              </div>
-              <div class="acc-item">
-                <button class="acc-btn">Can I customize it?</button>
-                <div class="acc-content">Yes. Tweak variables, replace cards, plug real data into charts and tables.</div>
-              </div>
-              <div class="acc-item">
-                <button class="acc-btn">Licensing?</button>
-                <div class="acc-content">Use freely for personal and commercial projects. Replace the hero image if you prefer your own.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Forms & Upload -->
-        <div id="forms" class="grid-2 section">
-          <div class="card">
-            <h2>Quick Form</h2>
-            <p class="desc">Client-side validation and a modal confirmation.</p>
-            <form id="demoForm" novalidate>
-              <div class="form-grid">
-                <div>
-                  <label for="name">Name</label>
-                  <input id="name" name="name" type="text" required placeholder="Your name" />
-                </div>
-                <div>
-                  <label for="email">Email</label>
-                  <input id="email" name="email" type="email" required placeholder="you@example.com" />
-                </div>
-                <div>
-                  <label for="plan">Plan</label>
-                  <select id="plan" name="plan">
-                    <option>Free</option>
-                    <option>Pro</option>
-                    <option>Enterprise</option>
-                  </select>
-                </div>
-                <div>
-                  <label for="qty">Seats</label>
-                  <input id="qty" name="qty" type="number" min="1" value="1" />
-                </div>
-                <div style="grid-column: 1 / -1;">
-                  <label for="msg">Message</label>
-                  <textarea id="msg" name="msg" rows="4" placeholder="What do you need?" ></textarea>
-                  <div class="helper">We will never share your info.</div>
-                </div>
-              </div>
-              <div class="row" style="margin-top: 12px;">
-                <button class="btn primary" type="submit">Submit</button>
-                <button class="btn" type="reset">Reset</button>
-              </div>
-            </form>
-          </div>
-
-          <div id="upload" class="card">
-            <h2>Drag & Drop Upload</h2>
-            <p class="desc">Drop files to preview filenames. No server required.</p>
-            <div id="dropzone" class="dropzone" tabindex="0">Drop files here or click to select</div>
-            <ul id="fileList" style="margin-top: 12px; padding-left: 18px;"></ul>
-            <div style="margin-top: 12px;">
-              <div class="row"><span class="mute">Upload progress</span><span class="spacer"></span><span id="progressLabel" class="mute">0%</span></div>
-              <div class="progress" aria-label="Simulated upload progress"><div id="progressBar"></div></div>
-            </div>
-          </div>
-        </div>
-
-        <div id="about" class="section card">
-          <h2>About this Playground</h2>
-          <p class="desc">Built to be copied. Keep what you like, delete what you don’t.</p>
-          <ul>
-            <li>Change theme with the moon button in the top bar. Preference is saved locally.</li>
-            <li>Swap the hero image by editing the <code>--hero-img</code> CSS variable.</li>
-            <li>Replace sample data in the table and charts with your own.</li>
-          </ul>
-        </div>
-      </div>
-
-      <footer>
-        <small>© <span id="year"></span> Modern Dashboard Playground. Built with HTML, CSS, and a sprinkle of JavaScript. Charts by <a class="inline" href="https://www.chartjs.org/" target="_blank" rel="noopener">Chart.js</a>.</small>
-      </footer>
-    </main>
+  <div class="announce" id="announce" role="status">
+    Service notice: deliveries in Tirol may be delayed due to weather. <button class="link" id="dismissNotice">Dismiss</button>
   </div>
 
-  <!-- Modal -->
-  <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 style="margin:0">Form Submitted</h3>
-        <button class="icon-btn" id="modalClose" aria-label="Close modal">✕</button>
+  <main class="container">
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Send, track, and receive with confidence</h1>
+        <p>This is a lightweight demo you can deploy to GitHub Pages. It is built to be “Marker ready” with stable selectors and realistic flows.</p>
+        <form id="quickTrack" class="track-form" action="track.html">
+          <label class="visually-hidden" for="qt">Tracking number</label>
+          <input id="qt" name="id" type="text" placeholder="Enter tracking number (e.g. AT1234567890)" pattern="[A-Za-z]{2}[0-9]{10}" required />
+          <button class="btn primary" type="submit">Track</button>
+        </form>
+        <div class="hero-cta">
+          <a class="btn" href="pricing.html">Calculate price</a>
+          <a class="btn" href="locations.html">Find a location</a>
+        </div>
       </div>
-      <p class="mute">Thanks. This didn’t go anywhere, but it felt productive.</p>
-      <div class="row" style="justify-content:flex-end; margin-top: 12px;">
-        <button class="btn primary" id="modalOk">OK</button>
+      <div class="hero-art" aria-hidden="true"></div>
+    </section>
+
+    <section class="cards">
+      <article class="card">
+        <h3>Reliable delivery</h3>
+        <p>Standard, Express, International. Choose what fits. This site simulates statuses so you can demo flows without a backend.</p>
+      </article>
+      <article class="card">
+        <h3>Transparent tracking</h3>
+        <p>Follow your parcel from Vienna to Graz with a simple timeline. Shareable links included.</p>
+      </article>
+      <article class="card">
+        <h3>Simple pricing</h3>
+        <p>Domestic or international, letter or parcel. Use the calculator to estimate cost with a clean breakdown.</p>
+      </article>
+    </section>
+
+    <section class="grid">
+      <div class="panel">
+        <h2>Popular actions</h2>
+        <ul class="list">
+          <li><a href="track.html" data-marker-id="popular-track">Track a shipment</a></li>
+          <li><a href="pricing.html" data-marker-id="popular-pricing">Calculate parcel price</a></li>
+          <li><a href="locations.html" data-marker-id="popular-locations">Find a post office</a></li>
+          <li><a href="help.html#faq" data-marker-id="popular-faq">Read the FAQ</a></li>
+        </ul>
       </div>
+      <div class="panel">
+        <h2>Why this demo</h2>
+        <p>This is a static site intended for QA training and bug-reporting demonstrations. It includes predictable selectors and components that are easy to annotate in screenshots.</p>
+        <ul class="ticks">
+          <li>Stable IDs and data attributes for annotations</li>
+          <li>Interactive forms with validation</li>
+          <li>Tables, filters, and a timeline component</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container row">
+      <small>© <span id="year"></span> Austrian Post Demo. Not an official site.</small>
+      <a class="link" href="help.html">Contact</a>
     </div>
-  </div>
+  </footer>
 
-  <div id="toast" class="toast" role="status" aria-live="polite">Hello from your dashboard.</div>
-
-  <noscript>
-    <div style="padding:12px; background:#fee; color:#111; text-align:center;">This page works best with JavaScript enabled.</div>
-  </noscript>
-
-  <!-- Chart.js via CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    // Theme handling
-    const root = document.documentElement;
-    const themeToggle = document.getElementById('themeToggle');
-    const themeLabel = document.getElementById('themeLabel');
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    function applyTheme(theme) {
-      if (theme === 'light') {
-        root.classList.add('theme-light');
-        themeLabel.textContent = 'Light';
-      } else {
-        root.classList.remove('theme-light');
-        themeLabel.textContent = 'Dark';
-      }
-      localStorage.setItem('theme', theme);
-    }
-    applyTheme(savedTheme);
-    themeToggle.addEventListener('click', () => {
-      const next = root.classList.contains('theme-light') ? 'dark' : 'light';
-      applyTheme(next);
-    });
-
-    // Sidebar for mobile
-    const openSidebar = document.getElementById('openSidebar');
-    const closeSidebar = document.getElementById('closeSidebar');
-    const sidebar = document.getElementById('sidebar');
-    const backdrop = document.getElementById('backdrop');
-    openSidebar.addEventListener('click', () => { sidebar.classList.add('open'); backdrop.classList.add('show'); });
-    closeSidebar.addEventListener('click', () => { sidebar.classList.remove('open'); backdrop.classList.remove('show'); });
-    backdrop.addEventListener('click', () => { sidebar.classList.remove('open'); backdrop.classList.remove('show'); });
-
-    // Hero image from CSS var
-    const heroImg = document.getElementById('heroImg');
-    const heroVar = getComputedStyle(document.documentElement).getPropertyValue('--hero-img').trim();
-    if (heroVar && heroVar.startsWith('url(')) {
-      const url = heroVar.slice(4, -1).replace(/['"]/g, '');
-      heroImg.src = url;
-    }
-
-    // Charts
-    function makeLineChart() {
-      const ctx = document.getElementById('lineChart').getContext('2d');
-      return new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-          datasets: [
-            { label: 'Visitors', data: [900, 1200, 1350, 1500, 1800, 2100, 2300, 2600], borderColor: getComputedStyle(root).getPropertyValue('--primary').trim(), tension: .35 },
-            { label: 'Signups', data: [120, 160, 190, 210, 260, 300, 340, 370], borderColor: getComputedStyle(root).getPropertyValue('--primary-2').trim(), tension: .35 }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: true } },
-          scales: { y: { grid: { color: 'rgba(128,128,128,.18)' } }, x: { grid: { display: false } } }
-        }
-      });
-    }
-
-    function makeBarChart() {
-      const ctx = document.getElementById('barChart').getContext('2d');
-      return new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon'],
-          datasets: [{ label: 'Revenue', data: [32, 41, 25, 38, 29], backgroundColor: getComputedStyle(root).getPropertyValue('--accent').trim() }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: { y: { grid: { color: 'rgba(128,128,128,.18)' } }, x: { grid: { display: false } } }
-        }
-      });
-    }
-
-    let lineChart = makeLineChart();
-    let barChart = makeBarChart();
-
-    // Repaint charts when theme toggles (to recalc colors)
-    const observer = new MutationObserver(() => {
-      lineChart.destroy(); barChart.destroy();
-      lineChart = makeLineChart(); barChart = makeBarChart();
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-
-    // Sortable table
-    const table = document.getElementById('dataTable');
-    const headers = table.querySelectorAll('th');
-    headers.forEach(h => h.addEventListener('click', () => sortBy(h)));
-
-    function sortBy(header) {
-      const key = header.dataset.key;
-      const type = header.dataset.type || 'string';
-      const tbody = table.querySelector('tbody');
-      const rows = Array.from(tbody.querySelectorAll('tr'));
-      const asc = !(header.dataset.order === 'asc');
-      headers.forEach(h => h.removeAttribute('data-order'));
-      header.dataset.order = asc ? 'asc' : 'desc';
-
-      rows.sort((a, b) => {
-        const A = a.children[Array.from(header.parentElement.children).indexOf(header)].textContent.trim();
-        const B = b.children[Array.from(header.parentElement.children).indexOf(header)].textContent.trim();
-        if (type === 'number') return (parseFloat(A) - parseFloat(B)) * (asc ? 1 : -1);
-        if (type === 'date') return ((new Date(A)) - (new Date(B))) * (asc ? 1 : -1);
-        return A.localeCompare(B) * (asc ? 1 : -1);
-      });
-
-      rows.forEach(r => tbody.appendChild(r));
-    }
-
-    // Tabs
-    document.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(btn.dataset.tab).classList.add('active');
-    }));
-
-    // Accordion
-    document.querySelectorAll('.acc-btn').forEach(b => b.addEventListener('click', () => {
-      const item = b.closest('.acc-item');
-      item.classList.toggle('open');
-    }));
-
-    // Modal + Form validation
-    const form = document.getElementById('demoForm');
-    const modalBackdrop = document.getElementById('modalBackdrop');
-    const modalClose = document.getElementById('modalClose');
-    const modalOk = document.getElementById('modalOk');
-
-    function openModal() { modalBackdrop.style.display = 'flex'; modalBackdrop.setAttribute('aria-hidden', 'false'); }
-    function closeModal() { modalBackdrop.style.display = 'none'; modalBackdrop.setAttribute('aria-hidden', 'true'); }
-
-    modalClose.addEventListener('click', closeModal);
-    modalOk.addEventListener('click', closeModal);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      if (!form.checkValidity()) { showToast('Please fill in the required fields.'); return; }
-      openModal();
-    });
-
-    // Toast
-    const toast = document.getElementById('toast');
-    function showToast(msg) {
-      toast.textContent = msg;
-      toast.style.display = 'block';
-      setTimeout(() => toast.style.display = 'none', 2500);
-    }
-    document.getElementById('notifyBtn').addEventListener('click', () => showToast('This is a toast. Delicious.'));
-
-    // Drag & Drop
-    const dz = document.getElementById('dropzone');
-    const list = document.getElementById('fileList');
-    const progress = document.getElementById('progressBar');
-    const progressLabel = document.getElementById('progressLabel');
-
-    function fakeUpload(files) {
-      list.innerHTML = '';
-      [...files].forEach(f => {
-        const li = document.createElement('li'); li.textContent = `${f.name} (${Math.round(f.size/1024)} KB)`; list.appendChild(li);
-      });
-      progress.style.width = '0%'; progressLabel.textContent = '0%';
-      let pct = 0; const timer = setInterval(() => { pct += Math.random() * 18; if (pct >= 100) { pct = 100; clearInterval(timer); showToast('Upload complete'); }
-        progress.style.width = pct + '%'; progressLabel.textContent = Math.round(pct) + '%';
-      }, 250);
-    }
-
-    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-    ;['dragenter','dragover','dragleave','drop'].forEach(ev => dz.addEventListener(ev, preventDefaults));
-    ;['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, () => dz.classList.add('dragover')));
-    ;['dragleave','drop'].forEach(ev => dz.addEventListener(ev, () => dz.classList.remove('dragover')));
-    dz.addEventListener('drop', e => fakeUpload(e.dataTransfer.files));
-    dz.addEventListener('click', () => {
-      const input = document.createElement('input'); input.type = 'file'; input.multiple = true; input.onchange = () => fakeUpload(input.files); input.click();
-    });
-
-    // Search demo
-    const search = document.getElementById('searchInput');
-    search.addEventListener('keydown', e => { if (e.key === 'Enter') showToast(`Search: "${search.value}"`); });
-
-    // Footer year
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
+  <script src="assets/app.js"></script>
 </body>
 </html>

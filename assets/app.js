@@ -1,0 +1,1 @@
+document.addEventListener('DOMContentLoaded',()=>{console.log('Demo site loaded')});
